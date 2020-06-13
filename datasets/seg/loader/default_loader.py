@@ -111,6 +111,9 @@ class DefaultLoader(data.Dataset):
 
         for file_name in _inner_list_file(label_dir):
             image_name = '.'.join(file_name.split('.')[:-1])
+            # ignore broken image
+            if image_name in ["000000039928", "000000271633"] and dataset == 'train':
+                continue
             label_path = os.path.join(label_dir, file_name)
             img_path = ImageHelper.imgpath(image_dir, image_name)
             if not _inner_exist_file(label_path) or img_path is None:

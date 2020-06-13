@@ -52,6 +52,7 @@ class DataLoader(object):
                               img_transform=self.img_transform,
                               label_transform=self.label_transform,
                               configer=self.configer)
+            print("finish load")
             sampler = None
             Log.info('Get sampler')
             if self.configer.get('network.distributed'):
