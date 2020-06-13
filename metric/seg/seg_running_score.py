@@ -43,7 +43,10 @@ class SegRunningScore(object):
         fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
         cls_iu = dict(zip(range(self.n_classes), iu))
 
-        return acc, acc_cls, fwavacc, mean_iu, cls_iu
+        return acc, acc_cls, fwavacc, mean_iu, cls_iu, iu
+
+    def get_seperate_iou(self):
+        return self._get_scores()[5]
 
     def get_mean_iou(self):
         return self._get_scores()[3]
