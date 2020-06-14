@@ -40,6 +40,8 @@ class SegEvaluator(object):
         for filename in os.listdir(pred_dir):
             pred_path = os.path.join(pred_dir, filename)
             gt_path = os.path.join(gt_dir, filename)
+            if not os.path.exists(gt_path):
+                continue
             predmap = ImageHelper.to_np(ImageHelper.read_image(pred_path, tool='pil', mode='P'))
             gtmap = ImageHelper.to_np(ImageHelper.read_image(gt_path, tool='pil', mode='P'))
             predmap = self.relabel(np.copy(predmap))
