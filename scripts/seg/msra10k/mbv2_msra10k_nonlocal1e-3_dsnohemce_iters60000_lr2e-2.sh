@@ -11,14 +11,14 @@ cd ${WORK_DIR}
 DATA_DIR=$3
 
 BACKBONE="mobilenetv2_dilated8"
-MODEL_NAME="nonlocalnowd"
-CHECKPOINTS_NAME="mbv2_msra10k_nonlocalnowd_dsnohemce_iters60000_lr5e-2"$2
+MODEL_NAME="nonlocalbn"
+CHECKPOINTS_NAME="mbv2_msra10k_nonlocal1e-3_dsnohemce_iters60000_lr2e-2"$2
 PRETRAINED_MODEL=$4
 
-CONFIG_FILE='configs/seg/msra10k/NLnowd_fcn_msra10k_seg.conf'
+CONFIG_FILE='configs/seg/msra10k/DNL1e-3_fcn_msra10k_seg.conf'
 MAX_ITERS=60000
 LOSS_TYPE="dsnohemce_loss"
-BASE_LR=0.05
+BASE_LR=0.02
 
 LOG_DIR="./log/seg/msra10k/"
 LOG_FILE="${LOG_DIR}${CHECKPOINTS_NAME}.log"
