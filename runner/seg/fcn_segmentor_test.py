@@ -91,8 +91,8 @@ class FCNSegmentorTest(object):
         dummy_data['labelmap'] = torch.Tensor(1,1,257,257)
         #results = self._predict(data_dict)
         start_time = time.time()
-        for i in range(100):
-            with torch.no_grad():
+        with torch.no_grad():
+            for i in range(100):
                 results = self.seg_net(dummy_data)
         start_time = time.time() - start_time
         print("{} ms/frame".format(start_time*10))
