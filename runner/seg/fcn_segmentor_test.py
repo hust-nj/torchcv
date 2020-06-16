@@ -6,6 +6,7 @@
 
 import os
 import cv2
+import time
 import numpy as np
 import torch
 from PIL import Image
@@ -38,11 +39,12 @@ class FCNSegmentorTest(object):
 
     def _init_model(self):
         self.seg_net = self.seg_model_manager.get_seg_model()
-        self.seg_net = RunnerHelper.load_net(self, self.seg_net)
+        # self.seg_net = RunnerHelper.load_net(self, self.seg_net)
         self.seg_net.eval()
 
     def test(self, test_dir, out_dir):
         for _, data_dict in enumerate(self.test_loader.get_testloader(test_dir=test_dir)):
+        # for data_dict in [True,]:
             total_logits = None
             if self.configer.get('test', 'mode') == 'ss_test':
                 total_logits = self.ss_test(data_dict)
@@ -221,6 +223,10 @@ class FCNSegmentorTest(object):
         return cropped_starting
 
     def _predict(self, data_dict):
+        for k, p in data_dict.items():
+            print(k, p.shape)
+        dummy_data = dict()
+        dummy_data['img']
         with torch.no_grad():
             total_logits = list()
             results = self.seg_net(data_dict)
