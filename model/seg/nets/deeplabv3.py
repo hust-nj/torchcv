@@ -72,7 +72,7 @@ class DeepLabV3(nn.Module):
                                              norm_type=self.configer.get('network', 'norm_type')),
                                   nn.Conv2d(512, self.num_classes, kernel_size=1, stride=1, padding=0, bias=True))
         self.dsn = nn.Sequential(
-            nn.Conv2d(1024, 512, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(160, 512, kernel_size=3, stride=1, padding=1),
             ModuleHelper.BNReLU(512, norm_type=self.configer.get('network', 'norm_type')),
             nn.Dropout2d(0.1),
             nn.Conv2d(512, self.num_classes, kernel_size=1, stride=1, padding=0, bias=True)

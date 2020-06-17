@@ -12,7 +12,7 @@ DATA_DIR=$3
 
 BACKBONE="mobilenetv2_dilated8"
 MODEL_NAME="deeplabv3"
-CHECKPOINTS_NAME="mbv2_msra10k_nonlocalnowd_dsnohemce_iters60000_lr2e-2_257_"$2
+CHECKPOINTS_NAME="mbv2_msra10k_deeplabv3_dsnohemce_iters60000_lr2e-2_257_"$2
 PRETRAINED_MODEL=$4
 
 CONFIG_FILE='configs/seg/msra10k/NLnowd_fcn_msra10k_seg_257.conf'
