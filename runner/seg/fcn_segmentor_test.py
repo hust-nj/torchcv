@@ -39,6 +39,7 @@ class FCNSegmentorTest(object):
 
     def _init_model(self):
         self.seg_net = self.seg_model_manager.get_seg_model()
+#        self.seg_net = RunnerHelper.remove_syncbn(self.seg_net)
         print(self.seg_net)
         # self.seg_net = RunnerHelper.load_net(self, self.seg_net)
         self.seg_net.eval()
