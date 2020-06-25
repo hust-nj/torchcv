@@ -50,7 +50,7 @@ elif [[ "$1"x == "resume"x ]]; then
 elif [[ "$1"x == "val"x ]]; then
   ${PYTHON} main.py --config_file ${CONFIG_FILE} --phase test --gpu 0 1 2 3 --gather n \
                     --backbone ${BACKBONE} --model_name ${MODEL_NAME} --checkpoints_name ${CHECKPOINTS_NAME} \
-                    --resume ./checkpoints/seg/msra10k/${CHECKPOINTS_NAME}_latest.pth --resume_strict y\
+                    --resume ${PRETRAINED_MODEL} --resume_strict y\
                     --test_dir ${DATA_DIR}/val/image --out_dir val  2>&1 | tee -a ${LOG_FILE}
   cd metric/seg/
   ${PYTHON} seg_evaluator.py --config_file "../../"${CONFIG_FILE} \
