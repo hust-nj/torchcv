@@ -96,7 +96,9 @@ class FCNSegmentorTest(object):
             for i in range(100):
                 results = self.seg_net(dummy_data)
         start_time = time.time() - start_time
+        print("test 100 times with fake data")
         print("{} ms/frame".format(start_time*10))
+        exit(0)
         return results
 
     def ms_test(self, in_data_dict, params_dict):
