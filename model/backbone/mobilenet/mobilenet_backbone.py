@@ -23,6 +23,10 @@ class MobileNetBackbone(object):
             orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
             arch_net = MobileNetV2Dilated(orig_mobilenet, dilate_scale=8)
 
+        elif arch == 'mobilenetv2_dilated16':
+            orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
+            arch_net = MobileNetV2Dilated(orig_mobilenet, dilate_scale=16)
+
         else:
             raise Exception('Architecture undefined!')
 
