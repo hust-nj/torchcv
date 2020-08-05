@@ -28,10 +28,18 @@ class MobileNetBackbone(object):
             orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
             arch_net = MobileNetV2Dilated(orig_mobilenet, dilate_scale=16)
 
-        elif arch == 'mobilenetv2_fpn':
+        elif arch == 'mobilenetv2_fpn32':
             orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
-            arch_net = MobileNetV2FPN(orig_mobilenet)
-
+            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=32)
+        elif arch == 'mobilenetv2_fpn64':
+            orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
+            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=64)
+        elif arch == 'mobilenetv2_fpn128':
+            orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
+            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=128)
+        elif arch == 'mobilenetv2_fpn256':
+            orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
+            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=256)
         else:
             raise Exception('Architecture undefined!')
 
@@ -118,14 +126,14 @@ def conv_3x3_bn(inp, oup):
 
 
 class MobileNetV2FPN(nn.Module):
-    def __init__(self, orig_net):
+    def __init__(self, orig_net, lout_channels):
         super(MobileNetV2FPN, self).__init__()
         self.features = orig_net.features[:-1]
         self.total_idx = len(self.features)
         # self.down_idx = [2, 4, 7, 14]
         self.block_idx = [6, 13, 17]
         self.in_channels = [32, 96, 320]
-        self.lout_channels = 32
+        self.lout_channels = lout_channels
         self.out_channels = 320
         self.block_num = len(self.block_idx)
         self.lateral_convs = nn.ModuleList()
