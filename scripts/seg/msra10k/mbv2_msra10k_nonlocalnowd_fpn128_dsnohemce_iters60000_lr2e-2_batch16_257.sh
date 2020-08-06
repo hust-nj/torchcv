@@ -12,7 +12,7 @@ DATA_DIR=$3
 
 BACKBONE="mobilenetv2_fpn128"
 MODEL_NAME="nonlocalnowd"
-CHECKPOINTS_NAME="mbv2_msra10k_nonlocalnowd_fpn128_dsnohemce_iters60000_lr2e-2_257"$2
+CHECKPOINTS_NAME="mbv2_msra10k_nonlocalnowd_fpn128_dsnohemce_iters60000_lr2e-2_batch16_257"$2
 PRETRAINED_MODEL=$4
 
 CONFIG_FILE='configs/seg/msra10k/NLnowd_fcn_msra10k_seg_257.conf'
@@ -35,13 +35,13 @@ NGPUS=4
 DIST_PYTHON="${PYTHON} -m torch.distributed.launch --nproc_per_node=${NGPUS}"
 
 if [[ "$1"x == "train"x ]]; then
-  ${DIST_PYTHON} main.py --config_file ${CONFIG_FILE} --phase train --train_batch_size 2 --val_batch_size 1 \
+  ${DIST_PYTHON} main.py --config_file ${CONFIG_FILE} --phase train --train_batch_size 16 --val_batch_size 1 \
                          --backbone ${BACKBONE} --model_name ${MODEL_NAME} --gpu 0 1 2 3 --drop_last y --syncbn y --dist y \
                          --data_dir ${DATA_DIR} --base_lr ${BASE_LR} --loss_type ${LOSS_TYPE} --max_iters ${MAX_ITERS} \
                          --checkpoints_name ${CHECKPOINTS_NAME} --pretrained ${PRETRAINED_MODEL} 2>&1 | tee ${LOG_FILE}
 
 elif [[ "$1"x == "resume"x ]]; then
-  ${DIST_PYTHON} main.py --config_file ${CONFIG_FILE} --phase train --train_batch_size 2 --val_batch_size 1 \
+  ${DIST_PYTHON} main.py --config_file ${CONFIG_FILE} --phase train --train_batch_size 16 --val_batch_size 1 \
                          --backbone ${BACKBONE} --model_name ${MODEL_NAME} --gpu 0 1 2 3 --drop_last y --syncbn y --dist y \
                          --data_dir ${DATA_DIR} --loss_type ${LOSS_TYPE} --max_iters ${MAX_ITERS} \
                          --resume_continue y --resume_val y --resume ./checkpoints/seg/msra10k/${CHECKPOINTS_NAME}_latest.pth \
