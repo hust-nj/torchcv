@@ -12,7 +12,7 @@ DATA_DIR=$3
 
 BACKBONE="mobilenetv2_dilated16"
 MODEL_NAME="nonlocalnowd"
-CHECKPOINTS_NAME="scripts/seg/msra10k/mbv2_msra10k_nonlocalnowd_dilated16_gc34_dsnohemce_iters60000_lr2e-2"$2
+CHECKPOINTS_NAME="mbv2_msra10k_nonlocalnowd_dilated16_gc34_dsnohemce_iters60000_lr2e-2"$2
 PRETRAINED_MODEL=$4
 
 CONFIG_FILE='configs/seg/msra10k/NLnowd_fcn_msra10k_seg.conf'

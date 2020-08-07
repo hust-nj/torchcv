@@ -12,7 +12,7 @@ DATA_DIR=$3
 
 BACKBONE="mobilenetv2_dilated16"
 MODEL_NAME="nonlocalnowd"
-CHECKPOINTS_NAME="scripts/seg/msra10k/mbv2_msra10k_nonlocalnowd_dilated16_gc345_dsnohemce_iters60000_lr2e-2"$2
+CHECKPOINTS_NAME="mbv2_msra10k_nonlocalnowd_dilated16_gc345_dsnohemce_iters60000_lr2e-2"$2
 PRETRAINED_MODEL=$4
 
 CONFIG_FILE='configs/seg/msra10k/NLnowd_fcn_msra10k_seg.conf'
@@ -32,7 +32,7 @@ export NCCL_LL_THRESHOLD=0
 #export NCCL_TREE_THRESHOLD=0
 
 NGPUS=4
-DIST_PYTHON="${PYTHON} -m torch.distributed.launch --nproc_per_node=${NGPUS}"
+DIST_PYTHON="${PYTHON} -m torch.distributed.launch --nproc_per_node=${NGPUS} --master_port=23332"
 GC_BLOCK="--gc_index 6 13 17 --gc_ratio 16"
 
 if [[ "$1"x == "train"x ]]; then
