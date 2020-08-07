@@ -142,7 +142,7 @@ def conv_3x3_bn(inp, oup):
 
 
 class MobileNetV2FPN(nn.Module):
-    def __init__(self, orig_net, lout_channels):
+    def __init__(self, orig_net, lout_channels, configer):
         super(MobileNetV2FPN, self).__init__()
         self.features = orig_net.features[:-1]
         self.total_idx = len(self.features)
