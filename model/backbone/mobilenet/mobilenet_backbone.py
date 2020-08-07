@@ -79,11 +79,11 @@ class MobileNetV2Dilated(nn.Module):
         # add gc_block
         self.gc_blocks = nn.ModuleList()
         self.gc_index = configer.get("gcblock.gc_index", default=[])
-        self.gc_ratio = configer.get("gcblock.gc_ratio", default=16)
+        self.gc_ratio = configer.get("gcblock.gc_ratio", default=[])
         self.idx2gc = dict()
         self.idx2ch = {6:32, 13:96, 17:320}
-        for k in self.gc_index:
-            self.idx2gc[k] = ContextBlock(self.idx2ch[k], self.gc_ratio)
+        for i, k in enumerate(self.gc_index):
+            self.idx2gc[k] = ContextBlock(self.idx2ch[k], self.gc_ratio[i])
             self.gc_blocks.append(self.idx2gc[k])
 
     def _nostride_dilate(self, m, dilate):
@@ -166,11 +166,11 @@ class MobileNetV2FPN(nn.Module):
         # add gc_block
         self.gc_blocks = nn.ModuleList()
         self.gc_index = configer.get("gcblock.gc_index", default=[])
-        self.gc_ratio = configer.get("gcblock.gc_ratio", default=16)
+        self.gc_ratio = configer.get("gcblock.gc_ratio", default=[])
         self.idx2gc = dict()
         self.idx2ch = {6:32, 13:96, 17:320}
-        for k in self.gc_index:
-            self.idx2gc[k] = ContextBlock(self.idx2ch[k], self.gc_ratio)
+        for i, k in enumerate(self.gc_index):
+            self.idx2gc[k] = ContextBlock(self.idx2ch[k], self.gc_ratio[i])
             self.gc_blocks.append(self.idx2gc[k])
 
     def get_num_features(self):

@@ -33,7 +33,7 @@ export NCCL_LL_THRESHOLD=0
 
 NGPUS=4
 DIST_PYTHON="${PYTHON} -m torch.distributed.launch --nproc_per_node=${NGPUS}"
-GC_BLOCK="--gc_index 6 13 --gc_ratio 16"
+GC_BLOCK="--gc_index 6 13 --gc_ratio 1 2 4"
 
 if [[ "$1"x == "train"x ]]; then
   ${DIST_PYTHON} main.py --config_file ${CONFIG_FILE} --phase train --train_batch_size 2 --val_batch_size 1 \
