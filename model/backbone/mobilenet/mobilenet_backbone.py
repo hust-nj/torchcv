@@ -6,6 +6,7 @@
 import torch.nn as nn
 from model.backbone.mobilenet.mobilenet_models import MobileNetModels
 import torch.nn.functional as F
+from model.utils import ContextBlock
 
 class MobileNetBackbone(object):
     def __init__(self, configer):
@@ -22,24 +23,24 @@ class MobileNetBackbone(object):
         elif arch == 'mobilenetv2_dilated8':
             #arch_net = self.mobile_models.mobilenetv2_dilated8(pretrained=pretrained)
             orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
-            arch_net = MobileNetV2Dilated(orig_mobilenet, dilate_scale=8)
+            arch_net = MobileNetV2Dilated(orig_mobilenet, dilate_scale=8, configer=self.configer)
 
         elif arch == 'mobilenetv2_dilated16':
             orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
-            arch_net = MobileNetV2Dilated(orig_mobilenet, dilate_scale=16)
+            arch_net = MobileNetV2Dilated(orig_mobilenet, dilate_scale=16, configer=self.configer)
 
         elif arch == 'mobilenetv2_fpn32':
             orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
-            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=32)
+            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=32, configer=self.configer)
         elif arch == 'mobilenetv2_fpn64':
             orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
-            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=64)
+            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=64, configer=self.configer)
         elif arch == 'mobilenetv2_fpn128':
             orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
-            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=128)
+            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=128, configer=self.configer)
         elif arch == 'mobilenetv2_fpn256':
             orig_mobilenet = self.mobile_models.mobilenetv2(pretrained=pretrained)
-            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=256)
+            arch_net = MobileNetV2FPN(orig_mobilenet, lout_channels=256, configer=self.configer)
         else:
             raise Exception('Architecture undefined!')
 
@@ -47,7 +48,7 @@ class MobileNetBackbone(object):
 
 
 class MobileNetV2Dilated(nn.Module):
-    def __init__(self, orig_net, dilate_scale=8):
+    def __init__(self, orig_net, dilate_scale, configer):
         super(MobileNetV2Dilated, self).__init__()
         from functools import partial
 
@@ -74,6 +75,16 @@ class MobileNetV2Dilated(nn.Module):
                     partial(self._nostride_dilate, dilate=2)
                 )
         self.features = nn.Sequential(*self.features)
+
+        # add gc_block
+        self.gc_blocks = nn.ModuleList()
+        self.gc_index = configer.get("gcblock.gc_index", default=[])
+        self.gc_ratio = configer.get("gcblock.gc_ratio", default=16)
+        self.idx2gc = dict()
+        self.idx2ch = {6:32, 13:96, 17:320}
+        for k in self.gc_index:
+            self.idx2gc[k] = ContextBlock(self.idx2ch[k], self.gc_ratio)
+            self.gc_blocks.append(self.idx2gc[k])
 
     def _nostride_dilate(self, m, dilate):
         classname = m.__class__.__name__
@@ -106,9 +117,14 @@ class MobileNetV2Dilated(nn.Module):
             return conv_out
 
         else:
-            f1 = self.features[:15](x)
-            f2 = self.features[15:](f1)
-            return [f1, f2]
+            dsn_out = None
+            for i in range(self.total_idx):
+                x = self.features[i](x)
+                if i == 14:
+                    dsn_out = x
+                if i in self.gc_index:
+                    x = self.idx2gc[i](x)
+            return [dsn_out, x]
 
 def conv_1x1_bn(inp, oup):
     return nn.Sequential(
@@ -147,6 +163,16 @@ class MobileNetV2FPN(nn.Module):
 
         self.out_conv = conv_3x3_bn(self.lout_channels, self.out_channels)
 
+        # add gc_block
+        self.gc_blocks = nn.ModuleList()
+        self.gc_index = configer.get("gcblock.gc_index", default=[])
+        self.gc_ratio = configer.get("gcblock.gc_ratio", default=16)
+        self.idx2gc = dict()
+        self.idx2ch = {6:32, 13:96, 17:320}
+        for k in self.gc_index:
+            self.idx2gc[k] = ContextBlock(self.idx2ch[k], self.gc_ratio)
+            self.gc_blocks.append(self.idx2gc[k])
+
     def get_num_features(self):
         return 320
 
@@ -157,6 +183,8 @@ class MobileNetV2FPN(nn.Module):
             x = self.features[i](x)
             if i == 14:
                 dsn_out = x
+            if i in self.gc_index:
+                x = self.idx2gc[i](x)
             if i in self.block_idx:
                 conv_out.append(x)
         laterals = [

@@ -130,6 +130,8 @@ if __name__ == "__main__":
     parser.add_argument('--seed', default=None, type=int, help='manual seed')
     parser.add_argument('--cudnn', type=str2bool, nargs='?', default=True, help='Use CUDNN.')
     parser.add_argument("--local_rank", default=0, type=int)
+    parser.add_argument('--gc_index', default=[], nargs='+', type=int, dest='gcblock.gc_index')
+    parser.add_argument('--gc_ratio', default=16, type=int, dest='gcblock.gc_ratio')
 
     args = parser.parse_args()
     configer = Configer(args_parser=args)
