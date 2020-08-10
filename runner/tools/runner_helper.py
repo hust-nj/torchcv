@@ -28,6 +28,17 @@ class RunnerHelper(object):
 
         return in_data.to(device) if isinstance(in_data, torch.Tensor) else in_data
 
+    @classmethod
+    def remove_syncbn(cls, module):
+        module_output = module
+        if isinstance(module, torch.nn.modules.batchnorm._BatchNorm):
+            module_output = nn.Sequential()
+        for name, child in module.named_children():
+            module_output.add_module(name, cls.remove_syncbn(child))
+        del module
+        return module_output
+
+
     @staticmethod
     def _make_parallel(runner, net):
         if runner.configer.get('network.distributed', default=False):
@@ -244,4 +255,3 @@ class RunnerHelper(object):
     def get_lr(optimizer):
 
         return [param_group['lr'] for param_group in optimizer.param_groups]
-

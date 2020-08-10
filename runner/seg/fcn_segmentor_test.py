@@ -6,6 +6,7 @@
 
 import os
 import cv2
+import time
 import numpy as np
 import torch
 from PIL import Image
@@ -38,11 +39,14 @@ class FCNSegmentorTest(object):
 
     def _init_model(self):
         self.seg_net = self.seg_model_manager.get_seg_model()
-        self.seg_net = RunnerHelper.load_net(self, self.seg_net)
+        # self.seg_net = RunnerHelper.remove_syncbn(self.seg_net)
+        print(self.seg_net)
+        # self.seg_net = RunnerHelper.load_net(self, self.seg_net)
         self.seg_net.eval()
 
     def test(self, test_dir, out_dir):
-        for _, data_dict in enumerate(self.test_loader.get_testloader(test_dir=test_dir)):
+        # for _, data_dict in enumerate(self.test_loader.get_testloader(test_dir=test_dir)):
+        for data_dict in [True,]:
             total_logits = None
             if self.configer.get('test', 'mode') == 'ss_test':
                 total_logits = self.ss_test(data_dict)
@@ -82,8 +86,19 @@ class FCNSegmentorTest(object):
                 ImageHelper.save(label_img, label_path)
 
     def ss_test(self, in_data_dict):
-        data_dict = self.blob_helper.get_blob(in_data_dict, scale=1.0)
-        results = self._predict(data_dict)
+        #data_dict = self.blob_helper.get_blob(in_data_dict, scale=1.0)
+        dummy_data = dict()
+        dummy_data['img'] = torch.Tensor(1,3,257,257)
+        dummy_data['labelmap'] = torch.Tensor(1,1,257,257)
+        #results = self._predict(data_dict)
+        start_time = time.time()
+        with torch.no_grad():
+            for i in range(100):
+                results = self.seg_net(dummy_data)
+        start_time = time.time() - start_time
+        print("test 100 times with fake data")
+        print("{} ms/frame".format(start_time*10))
+        exit(0)
         return results
 
     def ms_test(self, in_data_dict, params_dict):
@@ -221,6 +236,8 @@ class FCNSegmentorTest(object):
         return cropped_starting
 
     def _predict(self, data_dict):
+        dummy_data = dict()
+        dummy_data['img']
         with torch.no_grad():
             total_logits = list()
             results = self.seg_net(data_dict)
@@ -242,5 +259,4 @@ class FCNSegmentorTest(object):
         label_dst = np.array(label_dst, dtype=np.uint8)
 
         return label_dst
-
 
