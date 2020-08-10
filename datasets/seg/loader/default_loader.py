@@ -22,6 +22,7 @@ class DefaultLoader(data.Dataset):
         self.aug_transform = aug_transform
         self.img_transform = img_transform
         self.label_transform = label_transform
+        Log.info('extra_msrab_ratio: {}'.format(self.configer.get('extra_msrab_ratio')))
         self.img_list, self.label_list = self.__list_dirs(root_dir, dataset)
         Log.info("{}/{} img count {}".format(root_dir, dataset, len(self.img_list)))
 
@@ -133,6 +134,21 @@ class DefaultLoader(data.Dataset):
 
                 img_list.append(img_path)
                 label_list.append(label_path)
+
+        if dataset == 'train' and self.configer.get('extra_msrab_ratio')>0.0:
+            image_dir = os.path.join(root_dir, 'msra10k_split/train/image')
+            label_dir = os.path.join(root_dir, 'msra10k_split/train/label')
+            for file_name in _inner_list_file(label_dir):
+                image_name = '.'.join(file_name.split('.')[:-1])
+                label_path = os.path.join(label_dir, file_name)
+                img_path = ImageHelper.imgpath(image_dir, image_name)
+                if not _inner_exist_file(label_path) or img_path is None:
+                    Log.warn('Label Path: {} not exists.'.format(label_path))
+                    continue
+
+                for _i in range(int(114646/7500*self.configer.get('extra_msrab_ratio'))+1):
+                    img_list.append(img_path)
+                    label_list.append(label_path)
 
         return img_list, label_list
 
