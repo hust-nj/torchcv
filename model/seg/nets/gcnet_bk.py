@@ -7,7 +7,6 @@ from model.tools.module_helper import ModuleHelper
 from model.seg.loss.loss import BASE_LOSS_DICT
 from model.seg.ops.context_block import ContextBlock
 
-
 class _ConvBatchNormReluBlock(nn.Module):
     def __init__(self, inplanes, outplanes, kernel_size, stride, padding=1, dilation=1, norm_type=None):
         super(_ConvBatchNormReluBlock, self).__init__()
@@ -24,16 +23,16 @@ class _ConvBatchNormReluBlock(nn.Module):
 class GCBModule(nn.Module):
     def __init__(self, in_channels, out_channels, num_classes, configer):
         super(GCBModule, self).__init__()
-        inter_channels = in_channels // 2
+        inter_channels = in_channels // 4
         self.configer = configer
         self.conva = nn.Sequential(nn.Conv2d(in_channels, inter_channels, 3, padding=1, bias=False),
                                    ModuleHelper.BNReLU(inter_channels, norm_type=self.configer.get('network', 'norm_type')))
-        self.ctb = ContextBlock(inter_channels, ratio=4)
+        self.ctb = ContextBlock(inter_channels, ratio=1./4)
         self.convb = nn.Sequential(nn.Conv2d(inter_channels, inter_channels, 3, padding=1, bias=False),
                                    ModuleHelper.BNReLU(inter_channels, norm_type=self.configer.get('network', 'norm_type')))
 
         self.bottleneck = nn.Sequential(
-            nn.Conv2d(in_channels+inter_channels, out_channels, kernel_size=1, padding=1, dilation=1, bias=False),
+            nn.Conv2d(in_channels+inter_channels, out_channels, kernel_size=3, padding=1, dilation=1, bias=False),
             ModuleHelper.BNReLU(out_channels, norm_type=self.configer.get('network', 'norm_type')),
             nn.Dropout2d(0.1),
             nn.Conv2d(512, num_classes, kernel_size=1, stride=1, padding=0, bias=True)
@@ -41,8 +40,10 @@ class GCBModule(nn.Module):
 
     def forward(self, x, recurrence=1):
         output = self.conva(x)
-        output = self.ctb(output)
+        if self.ctb is not None:
+            output = self.ctb(output)
         output = self.convb(output)
+
         output = self.bottleneck(torch.cat([x, output], 1))
         return output
 
@@ -55,10 +56,10 @@ class GCNet(nn.Sequential):
         self.backbone = BackboneSelector(configer).get_backbone()
         num_features = self.backbone.get_num_features()
         self.dsn = nn.Sequential(
-            _ConvBatchNormReluBlock(160, 64, 3, 1,
+            _ConvBatchNormReluBlock(num_features // 2, num_features // 4, 3, 1,
                                     norm_type=self.configer.get('network', 'norm_type')),
             nn.Dropout2d(0.1),
-            nn.Conv2d(64, self.num_classes, 1, 1, 0)
+            nn.Conv2d(num_features // 4, self.num_classes, 1, 1, 0)
         )
         self.gcb = GCBModule(num_features, 512, self.num_classes, configer)
 
