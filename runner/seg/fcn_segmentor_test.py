@@ -21,7 +21,7 @@ from tools.util.logger import Logger as Log
 from tools.parser.seg_parser import SegParser
 from tools.vis.seg_visualizer import SegVisualizer
 from tools.helper.dc_helper import DCHelper
-
+from model.utils import fuse_module
 
 class FCNSegmentorTest(object):
     def __init__(self, configer):
@@ -43,6 +43,15 @@ class FCNSegmentorTest(object):
         print(self.seg_net)
         # self.seg_net = RunnerHelper.load_net(self, self.seg_net)
         self.seg_net.eval()
+        fuse_module(self.seg_net)
+        print(self.seg_net)
+        # convert onnx
+        if False:
+            model = self.seg_net
+            dummy_input = {'img': torch.randn(1, 3, 416, 416)}
+            model.cpu()
+            torch.onnx.export(model.module, dummy_input, self.configer.get('network', 'checkpoints_name') + '.onnx', opset_version=11)
+            exit()
 
     def test(self, test_dir, out_dir):
         # for _, data_dict in enumerate(self.test_loader.get_testloader(test_dir=test_dir)):

@@ -1,2 +1,3 @@
 from .gcblock import ContextBlock
-__all__ = ["ContextBlock"]
+from .merge_bn import fuse_module
+__all__ = ["ContextBlock", "fuse_module"]
