@@ -20,7 +20,7 @@ from tools.util.logger import Logger as Log
 from tools.parser.seg_parser import SegParser
 from tools.vis.seg_visualizer import SegVisualizer
 from tools.helper.dc_helper import DCHelper
-
+from model.utils import fuse_module
 
 class FCNSegmentorTest(object):
     def __init__(self, configer):
@@ -40,6 +40,8 @@ class FCNSegmentorTest(object):
         self.seg_net = self.seg_model_manager.get_seg_model()
         self.seg_net = RunnerHelper.load_net(self, self.seg_net)
         self.seg_net.eval()
+        fuse_module(self.seg_net)
+        print(self.seg_net)
         # convert onnx
         if False:
             model = self.seg_net
