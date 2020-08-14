@@ -133,6 +133,8 @@ if __name__ == "__main__":
     parser.add_argument('--gc_index', default=[], nargs='+', type=int, dest='gcblock.gc_index')
     parser.add_argument('--gc_ratio', default=[], nargs='+', type=int, dest='gcblock.gc_ratio')
 
+    parser.add_argument('--extra_msrab_ratio', default=0.0, type=float, help='The ratio.')
+
     args = parser.parse_args()
     configer = Configer(args_parser=args)
 

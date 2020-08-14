@@ -150,7 +150,7 @@ class MobileNetV2FPN(nn.Module):
         self.block_idx = [6, 13, 17]
         self.in_channels = [32, 96, 320]
         self.lout_channels = lout_channels
-        self.out_channels = 320
+        self.out_channels = 128
         self.block_num = len(self.block_idx)
         self.lateral_convs = nn.ModuleList()
         self.fpn_convs = nn.ModuleList()
@@ -161,7 +161,7 @@ class MobileNetV2FPN(nn.Module):
             self.lateral_convs.append(l_conv)
             # self.fpn_convs.append(fpn_conv)
 
-        self.out_conv = conv_3x3_bn(self.lout_channels, self.out_channels)
+        self.out_conv = conv_1x1_bn(self.lout_channels, self.out_channels)
 
         # add gc_block
         self.gc_blocks = nn.ModuleList()
@@ -174,7 +174,7 @@ class MobileNetV2FPN(nn.Module):
             self.gc_blocks.append(self.idx2gc[k])
 
     def get_num_features(self):
-        return 320
+        return 128
 
     def forward(self, x):
         conv_out = []

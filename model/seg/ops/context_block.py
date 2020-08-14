@@ -26,7 +26,7 @@ class ContextBlock(nn.Module):
         assert len(fusion_types) > 0, 'at least one fusion should be used'
         self.inplanes = inplanes
         self.ratio = ratio
-        self.planes = int(inplanes * ratio)
+        self.planes = int(inplanes // ratio)
         self.pooling_type = pooling_type
         self.fusion_types = fusion_types
         if pooling_type == 'att':
