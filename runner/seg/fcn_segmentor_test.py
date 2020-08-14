@@ -88,8 +88,8 @@ class FCNSegmentorTest(object):
     def ss_test(self, in_data_dict):
         #data_dict = self.blob_helper.get_blob(in_data_dict, scale=1.0)
         dummy_data = dict()
-        dummy_data['img'] = torch.Tensor(1,3,257,257)
-        dummy_data['labelmap'] = torch.Tensor(1,1,257,257)
+        dummy_data['img'] = torch.Tensor(1,3,416,416)
+        dummy_data['labelmap'] = torch.Tensor(1,1,416,416)
         #results = self._predict(data_dict)
         start_time = time.time()
         with torch.no_grad():
